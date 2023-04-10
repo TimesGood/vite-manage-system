@@ -2,19 +2,16 @@
 	<div class="tags" v-if="tags.show">
 		<!--标签-->
 		<ul>
-			<li
-				class="tags-li"
-				v-for="(item, index) in tags.list"
-				:class="{active : isActive(item.path)}"
-				:key="index"
-			>
+			<li class="tags-li" v-for="(item, index) in tags.list" :class="{ active: isActive(item.path) }" :key="index">
 				<router-link :to="item.path" class="tags-li-title">{{ item.title }}</router-link>
-				<el-icon @click=""><Close /></el-icon>
+				<el-icon @click="closeTag(index)">
+					<Close />
+				</el-icon>
 			</li>
 		</ul>
 		<!--右侧下拉-->
 		<div class="tags-close-box">
-			<el-dropdown @command="">
+			<el-dropdown @command="handleTags">
 				<el-button size="small" type="primary">
 					标签选项
 					<el-icon class="el-icon--right">
@@ -32,21 +29,54 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-const tags = {
-			show : true,
-			list : [
-				{path:'/home',title:'首页'},
-				{path:'/user',title:'用户管理'},
-				{path:'/pageOne',title:'页面一'},
-				{path:'/pageTwo',title:'页面二'}
-			]
-		}
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { useTagsStore } from '../store/tags';
 const route = useRoute()
-	const isActive  = (path:string) => {
-		return path === route.path
-	}
+const router = useRouter()
+const tags = useTagsStore()
+const isActive = (path: string) => {
+	return path === route.path
+}
 
+// 设置标签
+const setTags = (route: any) => {
+	//查看标签是否已经存在
+	const isExist = tags.list.some(item => {
+		return item.path === route.fullPath;
+	});
+	if (!isExist) {
+		if (tags.list.length >= 8) tags.delTagItem(0);
+		tags.addTagItem({
+			name: route.name,
+			title: route.meta.title,
+			path: route.fullPath
+		});
+	}
+};
+setTags(route);
+//监听路由变化
+onBeforeRouteUpdate(to => {
+	setTags(to);
+});
+const closeTag = (index:number) => {
+	tags.delTagItem(index)
+}
+// 关闭全部标签
+const closeAll = () => {
+	tags.closeTagAll();
+	router.push('/');
+};
+// 关闭其他标签
+const closeOther = () => {
+	const curItem = tags.list.filter(item => {
+		return item.path === route.fullPath;
+	});
+	tags.closeTagsOther(curItem);
+};
+//处理标签
+const handleTags = (command: string) => {
+	command === 'other' ? closeOther() : closeAll();
+};
 </script>
 
 <style>
@@ -61,7 +91,7 @@ const route = useRoute()
 
 .tags ul {
 	box-sizing: border-box;
-	margin:0;
+	margin: 0;
 	width: 100%;
 	height: 100%;
 }
@@ -84,15 +114,18 @@ const route = useRoute()
 	-moz-transition: all 0.3s ease-in;
 	transition: all 0.3s ease-in;
 }
+
 /* 鼠标靠近 */
 .tags-li:not(.active):hover {
 	background: #f8f8f8;
 }
+
 /* 标签选中样式 */
 .tags-li.active {
 	color: #fff;
 	background-color: #409EFF;
 }
+
 /* 标签字体 */
 .tags-li-title {
 	float: left;
@@ -103,10 +136,12 @@ const route = useRoute()
 	margin-right: 5px;
 	color: #666;
 }
+
 /* 选中标签字体 */
 .tags-li.active .tags-li-title {
 	color: #fff;
 }
+
 /* 右侧菜单 */
 .tags-close-box {
 	position: absolute;
@@ -121,7 +156,7 @@ const route = useRoute()
 	box-shadow: -3px 0 15px 3px rgba(0, 0, 0, 0.1);
 	z-index: 10;
 }
+
 a {
 	text-decoration: none;
-}
-</style>
+}</style>

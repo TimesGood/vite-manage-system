@@ -14,10 +14,10 @@ const routes: RouteRecordRaw[] = [
         component: Main,//组件
         //子路由
         children: [
-            {path: '/home',name: '',component: () => import('../views/Home.vue')},//首页
-            {path: '/user',name: '',component: () => import('../views/User.vue')},//用户界面
-            {path: '/pageOne',name: '',component: () => import('../views/PageOne.vue')},//首页
-            {path: '/pageTwo',name: '',component: () => import('../views/PageTwo.vue')},//首页
+            {path: '/home',name: '系统首页',meta: {title: '系统首页'},component: () => import('../views/Home.vue')},//首页
+            {path: '/user',name: '用户界面',meta: {title: '用户界面'},component: () => import('../views/User.vue')},//用户界面
+            {path: '/pageOne',name: '页面一',meta: {title: '页面一'},component: () => import('../views/PageOne.vue')},//首页
+            {path: '/pageTwo',name: '页面二',meta: {title: '页面二'},component: () => import('../views/PageTwo.vue')},//首页
         ]
     }
     
