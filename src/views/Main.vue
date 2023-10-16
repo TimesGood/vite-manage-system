@@ -5,9 +5,11 @@
     <common-aside />
     <!--主页-->
     <div class="content-box" :class="{ 'main-collapse': sidebar.collapse }">
-        <!-- 页签 -->
+        <!--页签-->
         <tags />
+        <!--内容-->>
 		<div class="content">
+            <!--路由页面-->
 			<router-view></router-view>
 		</div>
 	</div>
